@@ -1,0 +1,602 @@
+{
+  "@context": {
+    "aem": "http://aem.live/ontology#",
+    "schema": "http://schema.org/",
+    "id": "@id",
+    "type": "@type",
+    "name": "schema:name",
+    "description": "schema:description",
+    "attributes": "aem:attributes",
+    "identityKey": "aem:identityKey",
+    "humanRef": "aem:humanRef",
+    "invariant": "aem:invariant",
+    "hasState": {
+      "@id": "aem:hasState",
+      "@type": "@id"
+    },
+    "initialState": {
+      "@id": "aem:initialState",
+      "@type": "@id"
+    },
+    "terminalStates": {
+      "@id": "aem:terminalStates",
+      "@type": "@id"
+    },
+    "relatesTo": {
+      "@id": "aem:relatesTo",
+      "@type": "@id"
+    },
+    "emitsEvent": {
+      "@id": "aem:emitsEvent",
+      "@type": "@id"
+    },
+    "from": {
+      "@id": "aem:from",
+      "@type": "@id"
+    },
+    "to": {
+      "@id": "aem:to",
+      "@type": "@id"
+    },
+    "precondition": "aem:precondition",
+    "postcondition": "aem:postcondition",
+    "requirements": "aem:requirements",
+    "responsibilities": "aem:responsibilities",
+    "Entity": "aem:Entity",
+    "Operation": "aem:Operation",
+    "State": "aem:State"
+  },
+  "@graph": [
+    {
+      "id": "aem:AEMProject",
+      "type": "Entity",
+      "name": "AEM Edge Delivery Services Project",
+      "description": "A website project built with Adobe Experience Manager Edge Delivery Services",
+      "identityKey": "projectId: UUID",
+      "humanRef": "projectName",
+      "attributes": {
+        "projectId": "string",
+        "projectName": "string",
+        "repository": "string",
+        "owner": "string",
+        "branch": "string",
+        "codeBasePath": "string",
+        "programmingLanguages": ["JavaScript ES6+", "CSS3", "HTML5"]
+      },
+      "invariant": [
+        "Project must have valid GitHub repository",
+        "Must follow AEM boilerplate structure",
+        "No build steps or transpilation allowed",
+        "Must maintain PageSpeed score of 100"
+      ],
+      "relatesTo": [
+        "aem:ProjectStructure",
+        "aem:ContentArchitecture",
+        "aem:CodeArchitecture"
+      ]
+    },
+    {
+      "id": "aem:ProjectStructure",
+      "type": "Entity",
+      "name": "Project Structure",
+      "description": "File and directory organization for the project",
+      "identityKey": "structureId: UUID",
+      "humanRef": "structureName",
+      "attributes": {
+        "structureId": "string",
+        "structureName": "string",
+        "directories": ["blocks/", "scripts/", "styles/", "icons/", "fonts/"],
+        "configFiles": [".eslintrc.js", ".stylelintrc.json", ".editorconfig"]
+      },
+      "invariant": [
+        "blocks/ directory must contain block subdirectories",
+        "scripts/ must contain aem.js (immutable) and scripts.js",
+        "styles/ must contain styles.css, lazy-styles.css, fonts.css",
+        "Each block must have matching .js and .css files"
+      ],
+      "relatesTo": [
+        "aem:Block",
+        "aem:Script",
+        "aem:Stylesheet"
+      ]
+    },
+    {
+      "id": "aem:Block",
+      "type": "Entity",
+      "name": "Block",
+      "description": "A reusable, self-contained content component",
+      "identityKey": "blockId: UUID",
+      "humanRef": "blockName",
+      "attributes": {
+        "blockId": "string",
+        "blockName": "string",
+        "path": "/blocks/{blockname}/",
+        "jsFile": "{blockname}.js",
+        "cssFile": "{blockname}.css",
+        "status": "INITIALIZED|LOADING|LOADED|ERROR"
+      },
+      "invariant": [
+        "Block name must match directory name",
+        "JavaScript must export default decorate function",
+        "CSS selectors must be scoped to .{blockname}",
+        "Block must be responsive (mobile-first)",
+        "Block must handle missing/extra content gracefully"
+      ],
+      "hasState": [
+        "aem:BlockInitialized",
+        "aem:BlockLoading",
+        "aem:BlockLoaded",
+        "aem:BlockError"
+      ],
+      "initialState": "aem:BlockInitialized",
+      "terminalStates": [
+        "aem:BlockLoaded",
+        "aem:BlockError"
+      ],
+      "relatesTo": [
+        "aem:Section",
+        "aem:ContentStructure"
+      ],
+      "emitsEvent": [
+        "aem:BlockLoadStarted",
+        "aem:BlockLoadCompleted",
+        "aem:BlockLoadFailed"
+      ]
+    },
+    {
+      "id": "aem:Script",
+      "type": "Entity",
+      "name": "Script",
+      "description": "JavaScript file in the project",
+      "identityKey": "scriptId: UUID",
+      "humanRef": "scriptPath",
+      "attributes": {
+        "scriptId": "string",
+        "scriptPath": "string",
+        "scriptName": "string",
+        "modifiable": "boolean",
+        "loadTiming": "EAGER|LAZY|DELAYED",
+        "exports": "array"
+      },
+      "invariant": [
+        "aem.js must never be modified",
+        "Must use ES6+ module syntax",
+        "Must include .js extension in imports",
+        "Must pass ESLint validation"
+      ],
+      "relatesTo": [
+        "aem:LoadingPhase"
+      ]
+    },
+    {
+      "id": "aem:Stylesheet",
+      "type": "Entity",
+      "name": "Stylesheet",
+      "description": "CSS file in the project",
+      "identityKey": "stylesheetId: UUID",
+      "humanRef": "stylesheetPath",
+      "attributes": {
+        "stylesheetId": "string",
+        "stylesheetPath": "string",
+        "stylesheetName": "string",
+        "loadTiming": "CRITICAL|LAZY|CONDITIONAL",
+        "scope": "GLOBAL|BLOCK"
+      },
+      "invariant": [
+        "Must use modern CSS (Grid, Flexbox, Custom Properties)",
+        "Must be mobile-first responsive",
+        "Block CSS must scope selectors to block class",
+        "Must pass Stylelint validation"
+      ],
+      "relatesTo": [
+        "aem:Block",
+        "aem:LoadingPhase"
+      ]
+    },
+    {
+      "id": "aem:ContentArchitecture",
+      "type": "Entity",
+      "name": "Content Architecture",
+      "description": "How content is structured and delivered",
+      "identityKey": "contentArchId: UUID",
+      "humanRef": "contentArchName",
+      "attributes": {
+        "contentArchId": "string",
+        "contentArchName": "string",
+        "authoringTools": ["Google Docs", "Microsoft Word", "SharePoint"],
+        "deliveryFormats": ["HTML", "Plain HTML", "Markdown", "JSON"]
+      },
+      "invariant": [
+        "Content must use semantic HTML5",
+        "Must follow section-block hierarchy",
+        "Must be server-side rendered",
+        "Must meet WCAG 2.1 AA accessibility standards"
+      ],
+      "relatesTo": [
+        "aem:Page",
+        "aem:Section",
+        "aem:Fragment"
+      ]
+    },
+    {
+      "id": "aem:Page",
+      "type": "Entity",
+      "name": "Page",
+      "description": "A complete web page with content",
+      "identityKey": "pageId: UUID",
+      "humanRef": "pagePath",
+      "attributes": {
+        "pageId": "string",
+        "pagePath": "string",
+        "title": "string",
+        "template": "string|null",
+        "theme": "string|null",
+        "metadata": "object"
+      },
+      "invariant": [
+        "Page must contain at least one section",
+        "Must have valid metadata",
+        "Must be accessible via URL path"
+      ],
+      "relatesTo": [
+        "aem:Section",
+        "aem:Fragment"
+      ]
+    },
+    {
+      "id": "aem:Section",
+      "type": "Entity",
+      "name": "Section",
+      "description": "A container for content and blocks within a page",
+      "identityKey": "sectionId: UUID",
+      "humanRef": "sectionIndex",
+      "attributes": {
+        "sectionId": "string",
+        "sectionIndex": "number",
+        "status": "INITIALIZED|LOADING|LOADED",
+        "styleClasses": "array"
+      },
+      "invariant": [
+        "Section must be wrapped in div.section",
+        "Can contain default content and/or blocks",
+        "Must be initially hidden (display: none)",
+        "Must become visible after loading"
+      ],
+      "hasState": [
+        "aem:SectionInitialized",
+        "aem:SectionLoading",
+        "aem:SectionLoaded"
+      ],
+      "initialState": "aem:SectionInitialized",
+      "terminalStates": [
+        "aem:SectionLoaded"
+      ],
+      "relatesTo": [
+        "aem:Page",
+        "aem:Block"
+      ]
+    },
+    {
+      "id": "aem:Fragment",
+      "type": "Entity",
+      "name": "Fragment",
+      "description": "Reusable content loaded dynamically",
+      "identityKey": "fragmentId: UUID",
+      "humanRef": "fragmentPath",
+      "attributes": {
+        "fragmentId": "string",
+        "fragmentPath": "string",
+        "format": "PLAIN_HTML",
+        "usage": "array"
+      },
+      "invariant": [
+        "Fragment must be accessible as .plain.html",
+        "Must be decorated after loading",
+        "Media paths must be resolved relative to fragment"
+      ],
+      "relatesTo": [
+        "aem:Block",
+        "aem:Section"
+      ]
+    },
+    {
+      "id": "aem:CodeArchitecture",
+      "type": "Entity",
+      "name": "Code Architecture",
+      "description": "How code is organized and executes",
+      "identityKey": "codeArchId: UUID",
+      "humanRef": "codeArchName",
+      "attributes": {
+        "codeArchId": "string",
+        "codeArchName": "string",
+        "loadingStrategy": "THREE_PHASE",
+        "decorationPipeline": "SEQUENTIAL"
+      },
+      "invariant": [
+        "Must use three-phase loading (eager, lazy, delayed)",
+        "Must follow decoration pipeline order",
+        "Must be progressive enhancement",
+        "Must work without JavaScript"
+      ],
+      "relatesTo": [
+        "aem:LoadingPhase",
+        "aem:DecorationStep"
+      ]
+    },
+    {
+      "id": "aem:LoadingPhase",
+      "type": "Entity",
+      "name": "Loading Phase",
+      "description": "A phase in the three-phase loading strategy",
+      "identityKey": "phaseId: UUID",
+      "humanRef": "phaseName",
+      "attributes": {
+        "phaseId": "string",
+        "phaseName": "EAGER|LAZY|DELAYED",
+        "timing": "string",
+        "purpose": "string",
+        "functionName": "string"
+      },
+      "invariant": [
+        "Eager phase must achieve LCP",
+        "Lazy phase must load after LCP",
+        "Delayed phase must wait 3 seconds",
+        "Phases must execute in order"
+      ],
+      "relatesTo": [
+        "aem:Script",
+        "aem:Stylesheet",
+        "aem:Section"
+      ]
+    },
+    {
+      "id": "aem:DecorationStep",
+      "type": "Entity",
+      "name": "Decoration Step",
+      "description": "A step in the content decoration pipeline",
+      "identityKey": "stepId: UUID",
+      "humanRef": "stepName",
+      "attributes": {
+        "stepId": "string",
+        "stepName": "string",
+        "order": "number",
+        "functionName": "string",
+        "purpose": "string"
+      },
+      "invariant": [
+        "Steps must execute in order: icons, auto-blocks, sections, blocks, buttons",
+        "Each step must complete before next begins",
+        "Steps must be idempotent"
+      ],
+      "relatesTo": [
+        "aem:Block",
+        "aem:Section"
+      ]
+    },
+    {
+      "id": "aem:Author",
+      "type": "Entity",
+      "name": "Author",
+      "description": "Content creator who authors pages in AEM",
+      "identityKey": "authorId: UUID",
+      "humanRef": "authorName",
+      "attributes": {
+        "authorId": "string",
+        "authorName": "string",
+        "role": "CONTENT_AUTHOR",
+        "permissions": "array"
+      },
+      "invariant": [
+        "Must use approved authoring tools",
+        "Must follow content structure guidelines",
+        "Must preview before publishing"
+      ],
+      "relatesTo": [
+        "aem:Page",
+        "aem:Block"
+      ]
+    },
+    {
+      "id": "aem:Developer",
+      "type": "Entity",
+      "name": "Developer",
+      "description": "Software engineer who implements blocks and functionality",
+      "identityKey": "developerId: UUID",
+      "humanRef": "developerName",
+      "attributes": {
+        "developerId": "string",
+        "developerName": "string",
+        "role": "DEVELOPER",
+        "skills": "array"
+      },
+      "invariant": [
+        "Must follow code style guidelines",
+        "Must ensure accessibility compliance",
+        "Must maintain performance standards",
+        "Must write tests"
+      ],
+      "relatesTo": [
+        "aem:Block",
+        "aem:Script",
+        "aem:Stylesheet"
+      ]
+    },
+    {
+      "id": "aem:DecorateBlock",
+      "type": "Operation",
+      "name": "DecorateBlock",
+      "description": "Transform block HTML structure and add interactivity",
+      "from": "aem:Block",
+      "to": "aem:Block",
+      "precondition": [
+        "Block must be in INITIALIZED state",
+        "Block content must be in DOM",
+        "Block CSS and JS must be loaded"
+      ],
+      "postcondition": [
+        "Block is in LOADED state",
+        "Block HTML is transformed",
+        "Event listeners are attached",
+        "Block is visible to user"
+      ]
+    },
+    {
+      "id": "aem:LoadFragment",
+      "type": "Operation",
+      "name": "LoadFragment",
+      "description": "Fetch and decorate fragment content",
+      "from": "aem:Fragment",
+      "to": "aem:Section",
+      "precondition": [
+        "Fragment path must be valid",
+        "Fragment must exist as .plain.html",
+        "Network connection available"
+      ],
+      "postcondition": [
+        "Fragment HTML is fetched",
+        "Fragment content is decorated",
+        "Media paths are resolved",
+        "Fragment is inserted into target"
+      ]
+    },
+    {
+      "id": "aem:LoadSection",
+      "type": "Operation",
+      "name": "LoadSection",
+      "description": "Load all blocks within a section",
+      "from": "aem:Section",
+      "to": "aem:Section",
+      "precondition": [
+        "Section must be in INITIALIZED state",
+        "Section must contain blocks",
+        "Blocks must be decorated"
+      ],
+      "postcondition": [
+        "Section is in LOADED state",
+        "All blocks are loaded",
+        "Section is visible (display: block)",
+        "Optional callback executed"
+      ]
+    },
+    {
+      "id": "aem:AuthorContent",
+      "type": "Operation",
+      "name": "AuthorContent",
+      "description": "Author creates or modifies page content",
+      "from": "aem:Author",
+      "to": "aem:Page",
+      "precondition": [
+        "Author must have permissions",
+        "Authoring tool must be available",
+        "Content structure must be valid"
+      ],
+      "postcondition": [
+        "Page content is created/updated",
+        "Content follows structure guidelines",
+        "Content is saved in AEM",
+        "Content is available for preview"
+      ]
+    },
+    {
+      "id": "aem:ImplementBlock",
+      "type": "Operation",
+      "name": "ImplementBlock",
+      "description": "Developer creates or modifies a block",
+      "from": "aem:Developer",
+      "to": "aem:Block",
+      "precondition": [
+        "Block structure requirements defined",
+        "Developer has repository access",
+        "Code style guidelines understood"
+      ],
+      "postcondition": [
+        "Block JavaScript implements decorate function",
+        "Block CSS is scoped properly",
+        "Block is responsive and accessible",
+        "Block passes linting",
+        "Block is tested locally"
+      ]
+    },
+    {
+      "id": "aem:PublishContent",
+      "type": "Operation",
+      "name": "PublishContent",
+      "description": "Make content live on production",
+      "from": "aem:Page",
+      "to": "aem:Page",
+      "precondition": [
+        "Content must be previewed",
+        "Content must be approved",
+        "No blocking issues",
+        "Performance score meets target"
+      ],
+      "postcondition": [
+        "Content is live on production",
+        "Content is accessible to users",
+        "Analytics tracking active",
+        "Cache is updated"
+      ]
+    },
+    {
+      "id": "aem:OptimizeImage",
+      "type": "Operation",
+      "name": "OptimizeImage",
+      "description": "Create responsive, optimized picture element",
+      "from": "aem:Block",
+      "to": "aem:Block",
+      "precondition": [
+        "Image source URL must be valid",
+        "Breakpoints must be defined",
+        "Alt text must be provided"
+      ],
+      "postcondition": [
+        "Picture element created with WebP sources",
+        "Responsive sources for breakpoints",
+        "Fallback image included",
+        "Lazy loading configured"
+      ]
+    },
+    {
+      "id": "aem:BlockInitialized",
+      "type": "State",
+      "name": "BlockInitialized",
+      "description": "Block has been identified and decorated with classes"
+    },
+    {
+      "id": "aem:BlockLoading",
+      "type": "State",
+      "name": "BlockLoading",
+      "description": "Block CSS and JavaScript are being loaded"
+    },
+    {
+      "id": "aem:BlockLoaded",
+      "type": "State",
+      "name": "BlockLoaded",
+      "description": "Block is fully loaded, decorated, and visible"
+    },
+    {
+      "id": "aem:BlockError",
+      "type": "State",
+      "name": "BlockError",
+      "description": "Block failed to load due to error"
+    },
+    {
+      "id": "aem:SectionInitialized",
+      "type": "State",
+      "name": "SectionInitialized",
+      "description": "Section has been created and is hidden"
+    },
+    {
+      "id": "aem:SectionLoading",
+      "type": "State",
+      "name": "SectionLoading",
+      "description": "Section blocks are being loaded"
+    },
+    {
+      "id": "aem:SectionLoaded",
+      "type": "State",
+      "name": "SectionLoaded",
+      "description": "Section is fully loaded and visible"
+    }
+  ]
+}
