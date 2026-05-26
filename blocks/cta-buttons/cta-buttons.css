@@ -1,0 +1,78 @@
+.cta-buttons {
+  padding: 40px 24px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cta-buttons .cta-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.cta-buttons .buttons-wrapper {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cta-buttons .button-wrapper {
+  margin: 0;
+}
+
+.cta-buttons a.button {
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
+  min-width: 200px;
+  text-align: center;
+}
+
+.cta-buttons a.button.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cta-buttons a.button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+  text-decoration: none;
+}
+
+.cta-buttons a.button.secondary {
+  background: transparent;
+  border: 2px solid #667eea;
+  color: #667eea;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.cta-buttons a.button.secondary:hover {
+  background-color: #667eea;
+  color: white;
+  text-decoration: none;
+}
+
+.cta-buttons .scroll-text {
+  font-size: 14px;
+  color: #a0aec0;
+  margin-top: 16px;
+}
+
+@media (width < 600px) {
+  .cta-buttons .buttons-wrapper {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .cta-buttons a.button {
+    width: 100%;
+  }
+}
+
+/* Made with Bob */

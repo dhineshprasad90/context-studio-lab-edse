@@ -1374,3 +1374,632 @@ async function updateBlockContent(block, newPath) {
 3. **Fragments are the exception**: Only additional content fetched after load
 4. **No client-side routing**: Navigation loads new pages from server
 5. **Progressive enhancement**: Page works without JavaScript, enhanced with it
+
+
+---
+
+## HTML Component Layering and Positioning
+
+### Understanding the DOM Structure and CSS Layout
+
+AEM Edge Delivery Services uses a specific HTML layering structure with CSS positioning strategies to create the final page layout. Understanding this hierarchy is crucial for proper styling and component placement.
+
+### 1. Overall Page Structure
+
+```
+<html>
+  <head>
+    <!-- Meta tags, scripts, styles from head.html -->
+  </head>
+  <body class="appear">
+    <header>
+      <div class="header block">
+        <div class="nav-wrapper">
+          <nav>...</nav>
+        </div>
+      </div>
+    </header>
+    
+    <main>
+      <div class="section">
+        <div class="block-wrapper">
+          <div class="block">...</div>
+        </div>
+      </div>
+      <!-- More sections -->
+    </main>
+    
+    <footer>
+      <div class="footer block">...</div>
+    </footer>
+  </body>
+</html>
+```
+
+### 2. CSS Layering Hierarchy
+
+**Z-Index Stacking Context**:
+
+```
+Layer 10: Fixed/Sticky Navigation (z-index: 2)
+Layer 5:  Modals and Overlays (if implemented)
+Layer 3:  Dropdown Menus (positioned absolute)
+Layer 1:  Main Content (default stacking)
+Layer 0:  Background Images (z-index: -1)
+```
+
+### 3. Header Component Layering
+
+**HTML Structure**:
+```html
+<header>                                    <!-- Fixed height: 64px -->
+  <div class="header block">                <!-- Block wrapper -->
+    <div class="nav-wrapper">               <!-- Position: fixed (mobile), relative (desktop) -->
+      <nav id="nav">                        <!-- Grid/Flex layout -->
+        <div class="nav-hamburger">...</div> <!-- Grid area: hamburger -->
+        <div class="nav-brand">...</div>     <!-- Grid area: brand -->
+        <div class="nav-sections">...</div>  <!-- Grid area: sections -->
+        <div class="nav-tools">...</div>     <!-- Grid area: tools -->
+      </nav>
+    </div>
+  </div>
+</header>
+```
+
+**CSS Positioning Strategy**:
+
+```css
+/* Mobile Layout (< 900px) */
+header .nav-wrapper {
+  position: fixed;           /* Stays at top during scroll */
+  width: 100%;
+  z-index: 2;               /* Above main content */
+  background-color: white;
+}
+
+header nav {
+  display: grid;
+  grid-template:
+    'hamburger brand tools' 64px
+    'sections sections sections' 1fr / auto 1fr auto;
+  height: 64px;
+}
+
+/* When menu is open */
+header nav[aria-expanded='true'] {
+  grid-template:
+    'hamburger brand' 64px
+    'sections sections' 1fr
+    'tools tools' 64px / auto 1fr;
+  min-height: 100dvh;        /* Full viewport height */
+  overflow-y: auto;
+}
+
+/* Desktop Layout (>= 900px) */
+@media (width >= 900px) {
+  header .nav-wrapper {
+    position: relative;      /* Normal flow */
+  }
+  
+  header nav {
+    display: flex;           /* Horizontal layout */
+    justify-content: space-between;
+  }
+  
+  /* Dropdown menus */
+  header nav .nav-sections .default-content-wrapper > ul > li > ul {
+    position: absolute;      /* Float above content */
+    top: 150%;
+    left: -24px;
+    background-color: #f8f8f8;
+    z-index: 1;             /* Above other nav items */
+  }
+}
+```
+
+**Key Positioning Concepts**:
+- **Mobile**: Fixed positioning keeps nav visible during scroll
+- **Desktop**: Relative positioning allows normal document flow
+- **Dropdowns**: Absolute positioning creates floating menus
+- **Z-index**: Ensures nav stays above main content
+
+### 4. Main Content Layering
+
+**HTML Structure**:
+```html
+<main>
+  <div class="section hero-container">           <!-- Section with block-specific class -->
+    <div class="hero-wrapper">                    <!-- Block wrapper -->
+      <div class="hero block">                    <!-- The block itself -->
+        <div>                                     <!-- Block row -->
+          <div>                                   <!-- Block cell -->
+            <picture>...</picture>                <!-- Content -->
+          </div>
+        </div>
+        <div>
+          <div>
+            <h1>Heading</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section cards-container">
+    <div class="default-content-wrapper">        <!-- Default content wrapper -->
+      <p>Regular content</p>
+    </div>
+    <div class="cards-wrapper">
+      <div class="cards block">...</div>
+    </div>
+  </div>
+</main>
+```
+
+**CSS Positioning Strategy**:
+
+```css
+/* Section Layout */
+main > .section {
+  margin: 40px 0;           /* Vertical spacing between sections */
+}
+
+main > .section > div {
+  max-width: 1200px;        /* Content width constraint */
+  margin: auto;             /* Center horizontally */
+  padding: 0 24px;          /* Horizontal padding */
+}
+
+/* Section Variants */
+main .section.light,
+main .section.highlight {
+  background-color: #f8f8f8;
+  margin: 0;                /* Full-width background */
+  padding: 40px 0;          /* Vertical padding instead of margin */
+}
+```
+
+### 5. Hero Block Layering (Background Image Pattern)
+
+**HTML Structure**:
+```html
+<div class="hero block">
+  <div>
+    <div>
+      <picture>...</picture>  <!-- Background image -->
+    </div>
+  </div>
+  <div>
+    <div>
+      <h1>Heading</h1>        <!-- Foreground content -->
+    </div>
+  </div>
+</div>
+```
+
+**CSS Positioning Strategy**:
+
+```css
+.hero {
+  position: relative;        /* Establishes positioning context */
+  padding: 40px 24px;
+  min-height: 300px;
+}
+
+.hero picture {
+  position: absolute;        /* Remove from normal flow */
+  z-index: -1;              /* Behind text content */
+  inset: 0;                 /* Fill entire hero block */
+  object-fit: cover;
+}
+
+.hero img {
+  object-fit: cover;        /* Fill container, crop if needed */
+  width: 100%;
+  height: 100%;
+}
+
+.hero h1 {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  color: white;             /* Contrast with background */
+  position: relative;       /* Above background (default z-index: 0) */
+}
+```
+
+**Layering Breakdown**:
+```
+Layer 0:  Hero heading (relative, z-index: auto/0)
+Layer -1: Hero background image (absolute, z-index: -1)
+```
+
+### 6. Cards Block Layering (Grid Layout)
+
+**HTML Structure**:
+```html
+<div class="cards block">
+  <ul>
+    <li>
+      <div class="cards-card-image">
+        <picture>...</picture>
+      </div>
+      <div class="cards-card-body">
+        <h3>Title</h3>
+        <p>Description</p>
+      </div>
+    </li>
+    <!-- More cards -->
+  </ul>
+</div>
+```
+
+**CSS Positioning Strategy**:
+
+```css
+.cards > ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(257px, 1fr));
+  gap: 24px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cards > ul > li {
+  border: 1px solid #dadada;
+  background-color: white;
+  /* No explicit positioning - normal flow */
+}
+
+.cards .cards-card-image {
+  line-height: 0;           /* Remove extra space below image */
+}
+
+.cards > ul > li img {
+  width: 100%;
+  aspect-ratio: 4 / 3;      /* Maintain consistent proportions */
+  object-fit: cover;        /* Fill area, crop if needed */
+}
+
+.cards .cards-card-body {
+  margin: 16px;             /* Internal spacing */
+}
+```
+
+**Layout Characteristics**:
+- **Grid**: Responsive columns that adjust to container width
+- **Auto-fill**: Creates as many columns as fit
+- **Minmax**: Minimum 257px, maximum equal distribution
+- **Normal flow**: Cards stack naturally, no absolute positioning
+
+### 7. Columns Block Layering (Flexbox Layout)
+
+**HTML Structure**:
+```html
+<div class="columns block">
+  <div>                              <!-- Row -->
+    <div>                            <!-- Column 1 (text) -->
+      <h2>Heading</h2>
+      <p>Content</p>
+    </div>
+    <div class="columns-img-col">    <!-- Column 2 (image) -->
+      <picture>...</picture>
+    </div>
+  </div>
+</div>
+```
+
+**CSS Positioning Strategy**:
+
+```css
+/* Mobile Layout (< 900px) */
+.columns > div {
+  display: flex;
+  flex-direction: column;    /* Stack vertically */
+}
+
+.columns > div > div {
+  order: 1;                  /* Text columns default order */
+}
+
+.columns > div > .columns-img-col {
+  order: 0;                  /* Image column first */
+}
+
+.columns img {
+  width: 100%;
+}
+
+/* Desktop Layout (>= 900px) */
+@media (width >= 900px) {
+  .columns > div {
+    flex-direction: unset;   /* Horizontal (row) */
+    align-items: center;     /* Vertical centering */
+    gap: 24px;
+  }
+  
+  .columns > div > div {
+    flex: 1;                 /* Equal width distribution */
+    order: unset;            /* Natural order */
+  }
+}
+```
+
+**Layout Characteristics**:
+- **Mobile**: Vertical stack with image first (order: 0)
+- **Desktop**: Horizontal layout with equal column widths
+- **Flexbox**: Flexible sizing and alignment
+- **Order property**: Controls visual order without changing HTML
+
+### 8. Positioning Patterns Summary
+
+**Pattern 1: Fixed Positioning (Navigation)**
+```css
+.element {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 2;
+}
+```
+- **Use**: Sticky headers, persistent UI elements
+- **Behavior**: Removed from document flow, stays in viewport
+- **Considerations**: Requires z-index management
+
+**Pattern 2: Absolute Positioning (Background Images, Dropdowns)**
+```css
+.container {
+  position: relative;        /* Positioning context */
+}
+
+.element {
+  position: absolute;
+  inset: 0;                 /* Fill container */
+  z-index: -1;              /* Behind content */
+}
+```
+- **Use**: Background images, overlays, floating menus
+- **Behavior**: Positioned relative to nearest positioned ancestor
+- **Considerations**: Requires parent with position: relative
+
+**Pattern 3: Relative Positioning (Default Flow)**
+```css
+.element {
+  position: relative;       /* Or default static */
+  /* Normal document flow */
+}
+```
+- **Use**: Most content blocks
+- **Behavior**: Normal flow with optional offset
+- **Considerations**: Establishes positioning context for children
+
+**Pattern 4: Grid Layout (Cards, Navigation)**
+```css
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(257px, 1fr));
+  gap: 24px;
+}
+```
+- **Use**: Card grids, responsive layouts
+- **Behavior**: Two-dimensional layout system
+- **Considerations**: Responsive by default with auto-fill
+
+**Pattern 5: Flexbox Layout (Columns, Navigation)**
+```css
+.container {
+  display: flex;
+  flex-direction: column;   /* or row */
+  gap: 24px;
+}
+
+.item {
+  flex: 1;                  /* Equal distribution */
+}
+```
+- **Use**: One-dimensional layouts, alignment
+- **Behavior**: Flexible sizing and distribution
+- **Considerations**: Direction changes for responsive design
+
+### 9. Responsive Positioning Strategy
+
+**Mobile-First Approach**:
+
+```css
+/* Base styles (mobile) */
+.element {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+/* Tablet (>= 600px) */
+@media (width >= 600px) {
+  .element {
+    padding: 24px;
+  }
+}
+
+/* Desktop (>= 900px) */
+@media (width >= 900px) {
+  .element {
+    flex-direction: row;
+    padding: 32px;
+  }
+}
+
+/* Large Desktop (>= 1200px) */
+@media (width >= 1200px) {
+  .element {
+    max-width: 1200px;
+    margin: auto;
+  }
+}
+```
+
+**Breakpoint Strategy**:
+- **< 600px**: Mobile (single column, stacked)
+- **600px - 899px**: Tablet (may use 2 columns)
+- **900px - 1199px**: Desktop (multi-column, horizontal nav)
+- **>= 1200px**: Large desktop (max-width constraints)
+
+### 10. Common Layout Patterns
+
+**Full-Width Background with Constrained Content**:
+```css
+.section.highlight {
+  background-color: #f8f8f8;  /* Full width */
+  margin: 0;
+  padding: 40px 0;
+}
+
+.section.highlight > div {
+  max-width: 1200px;          /* Constrained content */
+  margin: auto;
+  padding: 0 24px;
+}
+```
+
+**Centered Content Container**:
+```css
+.container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 24px;
+}
+```
+
+**Aspect Ratio Images**:
+```css
+.image-container img {
+  width: 100%;
+  aspect-ratio: 4 / 3;        /* Maintain proportions */
+  object-fit: cover;          /* Fill area, crop if needed */
+}
+```
+
+**Overlay Pattern**:
+```css
+.container {
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.content {
+  position: relative;
+  z-index: 2;                 /* Above overlay */
+}
+```
+
+### 11. Block Wrapper Classes
+
+Every block gets automatic wrapper classes for styling:
+
+```html
+<div class="section {blockname}-container">    <!-- Section level -->
+  <div class="{blockname}-wrapper">            <!-- Wrapper level -->
+    <div class="{blockname} block">            <!-- Block level -->
+      <!-- Block content -->
+    </div>
+  </div>
+</div>
+```
+
+**Styling Hierarchy**:
+
+```css
+/* Section-level styling (affects section background/spacing) */
+.hero-container {
+  /* Full-width background, special spacing */
+}
+
+/* Wrapper-level styling (affects block container) */
+.hero-wrapper {
+  max-width: unset;          /* Override default max-width */
+  padding: 0;                /* Override default padding */
+}
+
+/* Block-level styling (affects block itself) */
+.hero {
+  position: relative;
+  padding: 40px 24px;
+  min-height: 300px;
+}
+```
+
+### 12. Visibility and Display Control
+
+**Initial State (Hidden)**:
+```css
+body {
+  display: none;             /* Hidden until decorated */
+}
+
+main > .section {
+  display: none;             /* Hidden until loaded */
+}
+
+header .header,
+footer .footer {
+  visibility: hidden;        /* Hidden until loaded */
+}
+```
+
+**Loaded State (Visible)**:
+```css
+body.appear {
+  display: block;            /* Visible after decoration */
+}
+
+main > .section[data-section-status="loaded"] {
+  display: block;            /* Visible after loading */
+}
+
+header .header[data-block-status="loaded"],
+footer .footer[data-block-status="loaded"] {
+  visibility: visible;       /* Visible after loading */
+}
+```
+
+**Why Different Properties?**:
+- **display: none**: Completely removes from layout (sections)
+- **visibility: hidden**: Reserves space but hides content (header/footer)
+
+### 13. Key Positioning Principles
+
+1. **Establish Positioning Context**: Use `position: relative` on containers for absolute children
+2. **Z-Index Management**: Only works on positioned elements (not static)
+3. **Stacking Order**: Higher z-index appears above lower (within same stacking context)
+4. **Mobile-First**: Start with mobile layout, enhance for larger screens
+5. **Flexbox for 1D**: Use for rows or columns with flexible sizing
+6. **Grid for 2D**: Use for complex layouts with rows and columns
+7. **Absolute for Overlays**: Use for backgrounds, dropdowns, modals
+8. **Fixed for Persistence**: Use for sticky headers, floating buttons
+9. **Normal Flow Default**: Most content should use normal document flow
+10. **Responsive Breakpoints**: 600px, 900px, 1200px for tablet, desktop, large desktop
+
+### 14. Performance Considerations
+
+**Layout Thrashing Prevention**:
+- Avoid frequent position changes
+- Use `transform` for animations instead of `top/left`
+- Batch DOM reads and writes
+- Use `will-change` sparingly for animated elements
+
+**Reflow Optimization**:
+- Fixed/absolute positioning removes elements from reflow calculations
+- Grid/flexbox are more performant than float-based layouts
+- Minimize nested positioning contexts
+
+**Paint Optimization**:
+- Separate layers for animated elements (z-index, transform)
+- Use `contain` property for isolated components
+- Avoid expensive properties (box-shadow, gradients) on large areas

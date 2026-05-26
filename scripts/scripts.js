@@ -67,6 +67,57 @@ function buildAutoBlocks(main) {
       });
     }
 
+    // Auto-create hero-banner block from first two divs if they match pattern
+    const firstSection = main.querySelector(':scope > div:first-child');
+    if (firstSection) {
+      const children = [...firstSection.children];
+      // Check if first section has 2 divs with text content (hero-banner pattern)
+      if (children.length === 2
+          && children[0].textContent.trim()
+          && children[1].textContent.trim()
+          && !children[0].querySelector('table')
+          && !children[1].querySelector('table')) {
+        const section = document.createElement('div');
+        section.append(buildBlock('hero-banner', { elems: [children[0], children[1]] }));
+        main.prepend(section);
+        firstSection.remove();
+      }
+    }
+
+    // Auto-create stats-metrics block from section with 3 rows of 2 columns
+    const sections = [...main.querySelectorAll(':scope > div')];
+    sections.forEach((section) => {
+      const children = [...section.children];
+      if (children.length === 3
+          && children.every((child) => child.children.length === 2)) {
+        const hasMetricPattern = children.every((child) => {
+          const cells = [...child.children];
+          return cells[0].textContent.trim() && cells[1].textContent.trim();
+        });
+        if (hasMetricPattern) {
+          const statsSection = document.createElement('div');
+          statsSection.append(buildBlock('stats-metrics', { elems: children }));
+          section.replaceWith(statsSection);
+        }
+      }
+    });
+
+    // Auto-create cta-buttons block from section with button links
+    sections.forEach((section) => {
+      const children = [...section.children];
+      if (children.length >= 2) {
+        const hasButtons = children.slice(0, 2).every((child) => {
+          const link = child.querySelector('a');
+          return link && (link.closest('strong') || link.closest('em'));
+        });
+        if (hasButtons) {
+          const ctaSection = document.createElement('div');
+          ctaSection.append(buildBlock('cta-buttons', { elems: children }));
+          section.replaceWith(ctaSection);
+        }
+      }
+    });
+
     buildHeroBlock(main);
   } catch (error) {
     // eslint-disable-next-line no-console

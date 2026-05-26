@@ -1,0 +1,56 @@
+.stats-metrics {
+  padding: 60px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stats-metrics .stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 48px;
+  text-align: center;
+}
+
+.stats-metrics .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.stats-metrics .stat-value {
+  font-size: 56px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.stats-metrics .stat-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@media (width < 900px) {
+  .stats-metrics .stat-value {
+    font-size: 48px;
+  }
+}
+
+@media (width < 600px) {
+  .stats-metrics .stats-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  
+  .stats-metrics .stat-value {
+    font-size: 40px;
+  }
+}
+
+/* Made with Bob */
