@@ -16,9 +16,8 @@
   line-height: 1.2;
   margin-bottom: 32px;
   background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: transparent;
 }
 
 .hero-banner-description {

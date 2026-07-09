@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "context-studio": {
+      "type": "streamable-http",
+      "url": "https://servicesessentials.ibm.com/mcp-gateway/service/gateway/servers/8ccdd203bdee4014b08e82eedb6046e2/mcp",
+      "headers": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjb250ZXh0LXN0dWRpby11c2VyQGV4YW1wbGUuY29tIiwianRpIjoiYjRkYTc4MjItYTY5YS00OTBmLTgyYTItOWNmMWJhOWJmYjFkIiwidG9rZW5fdXNlIjoiYXBpIiwiaWF0IjoxNzc5ODYzODQ2LCJpc3MiOiJtY3BnYXRld2F5IiwiYXVkIjoibWNwZ2F0ZXdheS1hcGkiLCJ1c2VyIjp7ImVtYWlsIjoiY29udGV4dC1zdHVkaW8tdXNlckBleGFtcGxlLmNvbSIsImZ1bGxfbmFtZSI6IkFQSSBUb2tlbiBVc2VyIiwiaXNfYWRtaW4iOmZhbHNlLCJhdXRoX3Byb3ZpZGVyIjoiYXBpX3Rva2VuIn0sInRlYW1zIjpbIjVhYTNiZDhkNDUxMDRlNzVhZDdhMzBjYTAzOTEyYzIwIl0sInNjb3BlcyI6eyJzZXJ2ZXJfaWQiOiI4Y2NkZDIwM2JkZWU0MDE0YjA4ZTgyZWVkYjYwNDZlMiIsInBlcm1pc3Npb25zIjpbImdhdGV3YXlzLnJlYWQiLCJzZXJ2ZXJzLnJlYWQiLCJzZXJ2ZXJzLnVzZSIsInRvb2xzLnJlYWQiLCJ0b29scy5leGVjdXRlIiwidGVhbXMucmVhZCIsInJlc291cmNlcy5yZWFkIiwicHJvbXB0cy5yZWFkIl0sImlwX3Jlc3RyaWN0aW9ucyI6W10sInRpbWVfcmVzdHJpY3Rpb25zIjp7fX0sImV4cCI6MTc4NzYzOTg0Nn0.BRkCr9oJF4UhOukN0Kt5GdrjlXSZfOBiBWZAZDun9Kc",
+        "x-api-key": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJlbWFpbEFkZHJlc3MiOiJEaGluZXNoLlByYXNhZC5DQGlibS5jb20iLCJ0ZWFtSWQiOiI2YTEzZWI3YzBmMzA1NzE5NWMyMWMxNTUiLCJjb250ZXh0SWQiOiJjdHhfZDUzODgyNzdhZDMxIiwiaWF0IjoxNzc5ODYzODQ1LCJleHAiOjE3ODc2Mzk4NDUsImlzcyI6ImNvbnRleHQtYnJva2VyIiwidG9rZW5faWQiOiI0MTRkY2IzZC1hZjJjLTQyM2ItYTU2NS02NTZhMzc1ODY5YTQifQ.IiOZVrFKKko8vZPB5owT2vY0Dhqrbq60Mzp0Ap8Z1WXuDxnaZhH_0g2ZAvgwZs2pgyc8Br4g9FCoPb2saqdgUQ"
+      },
+      "disabled": false
+    }
+  }
+}

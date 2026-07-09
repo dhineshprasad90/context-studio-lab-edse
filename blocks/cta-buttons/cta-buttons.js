@@ -1,12 +1,12 @@
 export default function decorate(block) {
   const container = document.createElement('div');
   container.classList.add('cta-container');
-  
+
   const buttonsWrapper = document.createElement('div');
   buttonsWrapper.classList.add('buttons-wrapper');
-  
+
   const rows = [...block.children];
-  
+
   // Process button rows (first two rows)
   rows.slice(0, 2).forEach((row) => {
     const cells = [...row.children];
@@ -21,9 +21,9 @@ export default function decorate(block) {
       }
     }
   });
-  
+
   container.append(buttonsWrapper);
-  
+
   // Process scroll text (third row)
   if (rows[2]) {
     const scrollText = document.createElement('div');
@@ -31,7 +31,7 @@ export default function decorate(block) {
     scrollText.textContent = rows[2].textContent.trim();
     container.append(scrollText);
   }
-  
+
   block.textContent = '';
   block.append(container);
 }
