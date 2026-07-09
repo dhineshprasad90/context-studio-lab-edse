@@ -1,0 +1,69 @@
+.car-finder {
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.car-finder .car-finder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.car-finder .car-finder-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.car-finder .car-finder-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.car-finder .car-finder-icon img,
+.car-finder .car-finder-icon svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.car-finder .car-finder-label {
+  font-size: 22px;
+  font-weight: 400;
+  color: #1c1c1c;
+  margin: 0;
+}
+
+.car-finder .car-finder-btn {
+  display: inline-block;
+  padding: 14px 28px;
+  border: 2px solid #1c1c1c;
+  color: #1c1c1c;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.car-finder .car-finder-btn:hover {
+  background-color: #1c1c1c;
+  color: #fff;
+}
+
+@media (width < 600px) {
+  .car-finder .car-finder-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .car-finder .car-finder-label {
+    font-size: 18px;
+  }
+}
